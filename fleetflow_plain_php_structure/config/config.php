@@ -1,2 +1,0 @@
-<?php
-// App config placeholder

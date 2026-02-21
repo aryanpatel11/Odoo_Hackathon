@@ -1,2 +1,0 @@
-<?php
-// Dashboard placeholder

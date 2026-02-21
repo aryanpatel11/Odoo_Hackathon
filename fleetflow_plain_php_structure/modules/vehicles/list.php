@@ -1,2 +1,0 @@
-<?php
-// Vehicle list

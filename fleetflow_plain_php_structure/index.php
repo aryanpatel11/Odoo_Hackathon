@@ -1,2 +1,0 @@
-<?php
-// Login page placeholder

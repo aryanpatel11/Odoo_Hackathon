@@ -1,2 +1,0 @@
-<?php
-// Create trip

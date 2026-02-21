@@ -1,2 +1,0 @@
-<?php
-// Sidebar template

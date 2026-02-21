@@ -1,2 +1,0 @@
-<?php
-// Auth + RBAC placeholder
