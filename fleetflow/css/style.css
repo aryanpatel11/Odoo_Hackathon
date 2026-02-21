@@ -664,14 +664,14 @@ tr:last-child td {
 }
 
 .btn-outline {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(223, 220, 220, 0.03);
     border: 1px solid var(--glass-border);
-    color: var(--text);
+    color: #fff;
     backdrop-filter: blur(4px);
 }
 
 .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(17, 17, 17, 0.1);
     border-color: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
 }
