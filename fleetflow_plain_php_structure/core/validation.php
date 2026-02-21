@@ -1,0 +1,2 @@
+<?php
+// Validation rules placeholder

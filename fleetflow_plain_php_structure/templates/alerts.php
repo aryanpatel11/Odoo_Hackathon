@@ -1,0 +1,2 @@
+<?php
+// Alerts template

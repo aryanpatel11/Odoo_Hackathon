@@ -1,0 +1,2 @@
+<?php
+// Delete vehicle
