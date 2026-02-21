@@ -12,8 +12,34 @@ $forgot = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['forgot'])) {
+        $email = trim($_POST['email'] ?? '');
         $forgot = true;
-        $error = '<span style="color:#4ade80">✓ If this email exists, a reset link has been sent.</span>';
+        $error = '<span style="color:var(--success)">✓ If this email exists, a reset link has been sent.</span>';
+        
+        if ($email) {
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            
+            if ($stmt->get_result()->num_rows > 0) {
+                // Generate token
+                $token = bin2hex(random_bytes(32));
+                $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+                
+                // Store in DB
+                $insert = $conn->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)");
+                $insert->bind_param("sss", $email, $token, $expires);
+                $insert->execute();
+                
+                // Simulate Email Delivery
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+                $host = $_SERVER['HTTP_HOST'];
+                $base_dir = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+                $resetLink = $protocol . $host . $base_dir . "/reset_password.php?token=" . $token;
+                
+                $error .= "<br><br><div style='padding:12px; background:rgba(13, 162, 146, 0.05); border-radius:8px; border:1px solid var(--primary); font-size:13px;'><strong style='color:var(--primary)'><i class='fas fa-info-circle'></i> Local Env Simulation:</strong><br>Normally this link is emailed. Since we have no SMTP server, click here to reset:<br><a href='{$resetLink}' style='color:var(--primary); font-weight:600; word-break:break-all;'>{$resetLink}</a></div>";
+            }
+        }
     } else {
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -51,8 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="login-page">
     <div class="login-box">
         <div class="login-logo">
-            <div class="icon">🚚</div>
-            <h1>FleetFlow</h1>
+            <div class="icon" style="margin-bottom: 20px;">
+                <img src="img/logo.png" alt="FleetFlow Logo" style="height: 60px; width: auto; display: block; margin: 0 auto; filter: drop-shadow(0 10px 15px rgba(13, 162, 146, 0.2));" onerror="this.onerror=null; this.outerHTML='<i class=\'fas fa-water\' style=\'font-size: 50px; color: var(--primary); filter: drop-shadow(0 0 10px rgba(13, 162, 146, 0.3));\'></i>';">
+            </div>
+            <h1 style="color: var(--primary);">FleetFlow</h1>
             <p>Modular Fleet & Logistics Management</p>
         </div>
 

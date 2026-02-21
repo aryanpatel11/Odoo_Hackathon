@@ -17,6 +17,14 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Default Admin Account (Password: admin123)
 INSERT INTO users (name, email, password, role) VALUES ('System Admin', 'admin@fleetflow.com', '$2y$10$eE0oI.1V0wU1lZ48zJgXquE6kH2/8uE7DkI0083tZ90t4wR.cQY9O', 'admin');
 

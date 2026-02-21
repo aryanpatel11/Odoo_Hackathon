@@ -59,8 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="login-page">
     <div class="login-box">
         <div class="login-logo">
-            <div class="icon">🚚</div>
-            <h1>FleetFlow Registration</h1>
+            <div class="icon" style="margin-bottom: 20px;">
+                <img src="img/logo.png" alt="FleetFlow Logo" style="height: 60px; width: auto; display: block; margin: 0 auto; filter: drop-shadow(0 10px 15px rgba(13, 162, 146, 0.2));" onerror="this.onerror=null; this.outerHTML='<i class=\'fas fa-water\' style=\'font-size: 50px; color: var(--primary); filter: drop-shadow(0 0 10px rgba(13, 162, 146, 0.3));\'></i>';">
+            </div>
+            <h1 style="color: var(--primary);">FleetFlow Registration</h1>
             <p>Create a staff account to access the platform</p>
         </div>
 

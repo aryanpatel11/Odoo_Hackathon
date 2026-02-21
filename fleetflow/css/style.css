@@ -3,45 +3,42 @@
 
 :root {
     /* Dynamic Brand Colors */
-    --primary: #3b82f6;
-    /* Electric Blue */
-    --primary-glow: rgba(59, 130, 246, 0.5);
-    --secondary: #8b5cf6;
-    /* Vibrant Purple */
-    --secondary-glow: rgba(139, 92, 246, 0.5);
-    --accent: #06b6d4;
-    /* Energetic Teal */
+    --primary: #0da292;
+    /* Ocean Teal from Logo */
+    --primary-glow: rgba(13, 162, 146, 0.3);
+    --secondary: #00cca7;
+    /* Bright Aqua Accent */
+    --secondary-glow: rgba(0, 204, 167, 0.3);
+    --accent: #26c6da;
+    /* Cyan */
 
-    /* Semantic Colors - Brighter for Dark Mode */
+    /* Semantic Colors - Bright & Accessible */
     --success: #10b981;
-    /* Emerald */
     --warning: #f59e0b;
-    /* Amber */
     --danger: #ef4444;
-    /* Rose Red */
     --info: #0ea5e9;
-    /* Sky Blue */
 
-    /* Glass Backgrounds & Dark Mode Surfaces */
-    --bg-base: #020617;
-    /* Deep Slate Black */
-    --glass-bg: rgba(15, 23, 42, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-highlight: rgba(255, 255, 255, 0.03);
+    /* Glass Backgrounds & Light Mode Surfaces */
+    --bg-base: #f4f7fb;
+    /* Very light cool gray/blue */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 1);
+    --glass-highlight: rgba(255, 255, 255, 0.6);
 
     /* Text Colors */
-    --text: #f8fafc;
-    /* Crisp White */
-    --text-muted: #94a3b8;
-    /* Light Slate */
+    --text: #1e293b;
+    /* Deep Slate for high contrast */
+    --text-muted: #64748b;
+    /* Soft slate for secondary text */
 
     /* Input & Structural Elements */
-    --input-bg: rgba(2, 6, 23, 0.5);
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --input-border: #e2e8f0;
     --sidebar-width: 280px;
 
-    /* Advanced Shadows */
-    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --shadow-glow: 0 0 15px var(--primary-glow);
+    /* Advanced Soft Neumorphic Shadows */
+    --shadow-glass: 0 10px 40px -10px rgba(13, 162, 146, 0.15);
+    --shadow-glow: 0 0 20px rgba(13, 162, 146, 0.2);
 }
 
 * {
@@ -54,9 +51,9 @@ body {
     font-family: 'Outfit', sans-serif;
     background: var(--bg-base);
     background-image:
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(13, 162, 146, 0.08) 0px, transparent 60%),
+        radial-gradient(at 100% 0%, rgba(0, 204, 167, 0.08) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(38, 198, 218, 0.08) 0px, transparent 60%);
     background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
@@ -176,11 +173,11 @@ h6 {
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
-    border-color: rgba(59, 130, 246, 0.3);
-    color: var(--text);
-    font-weight: 600;
-    box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.1);
+    background: linear-gradient(135deg, rgba(13, 162, 146, 0.1), rgba(0, 204, 167, 0.1));
+    border-color: rgba(13, 162, 146, 0.2);
+    color: var(--primary);
+    font-weight: 700;
+    box-shadow: inset 0 0 10px rgba(13, 162, 146, 0.05);
 }
 
 .nav-item.active::before {
@@ -218,7 +215,7 @@ h6 {
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid var(--glass-border);
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(13, 162, 146, 0.03);
 }
 
 .user-info {
@@ -472,13 +469,13 @@ h6 {
     justify-content: space-between;
     margin-bottom: 24px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--input-border);
 }
 
 .card-title {
     font-size: 18px;
     font-weight: 700;
-    color: #fff;
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -498,7 +495,8 @@ table {
 }
 
 th {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(13, 162, 146, 0.05);
+    /* Very light teal */
     padding: 16px 20px;
     text-align: left;
     font-size: 12px;
@@ -506,7 +504,7 @@ th {
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--input-border);
 }
 
 th:first-child {
@@ -520,14 +518,14 @@ th:last-child {
 td {
     padding: 16px 20px;
     font-size: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--input-border);
     vertical-align: middle;
     color: var(--text);
     transition: background 0.2s;
 }
 
 tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(13, 162, 146, 0.02);
 }
 
 tr:last-child td {
@@ -545,8 +543,7 @@ tr:last-child td {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid transparent;
 }
 
 .pill::before {
@@ -555,43 +552,37 @@ tr:last-child td {
     height: 6px;
     border-radius: 50%;
     background: currentColor;
-    box-shadow: 0 0 8px currentColor;
 }
 
 .pill-green {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34d399;
-    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    /* Darker emerald for light theme */
 }
 
 .pill-blue {
-    background: rgba(59, 130, 246, 0.15);
-    color: #60a5fa;
-    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
 }
 
 .pill-yellow {
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
 }
 
 .pill-red {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
 }
 
 .pill-gray {
     background: rgba(148, 163, 184, 0.1);
-    color: #94a3b8;
-    border-color: rgba(148, 163, 184, 0.2);
+    color: #64748b;
 }
 
 .pill-purple {
-    background: rgba(139, 92, 246, 0.15);
-    color: #a78bfa;
-    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
 }
 
 /* Glowing Buttons */
@@ -726,20 +717,21 @@ input,
 select,
 textarea {
     background: var(--input-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--input-border);
     border-radius: 10px;
     padding: 14px 16px;
-    color: #fff;
+    color: var(--text);
     font-size: 15px;
     transition: all 0.3s;
     width: 100%;
     font-family: inherit;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 input::placeholder,
 textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-muted);
+    opacity: 0.6;
 }
 
 input:focus,
@@ -747,13 +739,13 @@ select:focus,
 textarea:focus {
     outline: none;
     border-color: var(--primary);
-    background: rgba(15, 23, 42, 0.8);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(13, 162, 146, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 select option {
-    background: var(--bg-base);
-    color: #fff;
+    background: #ffffff;
+    color: var(--text);
 }
 
 textarea {
@@ -1097,8 +1089,9 @@ textarea {
 .empty-state .icon {
     font-size: 64px;
     margin-bottom: 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

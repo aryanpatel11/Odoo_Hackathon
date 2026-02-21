@@ -20,11 +20,14 @@ $user_role = $_SESSION['user_role'] ?? 'dispatcher';
 <div class="layout">
     <!-- Sidebar -->
     <aside class="sidebar">
+        <!-- Sidebar Logo -->
         <div class="sidebar-logo">
-            <div class="logo-icon">🚚</div>
+            <div class="logo-icon">
+                <img src="../img/logo.png" alt="Logo" style="height: 30px; width: auto; filter: drop-shadow(0 4px 6px rgba(13, 162, 146, 0.2));" onerror="this.onerror=null; this.outerHTML='<i class=\'fas fa-water\'></i>';">
+            </div>
             <div>
-                <div class="logo-text">FleetFlow</div>
-                <div class="logo-sub">Logistics System</div>
+                <div class="logo-text" style="color: var(--primary);">FleetFlow</div>
+                <div class="logo-sub">Command Center</div>
             </div>
         </div>
         <nav class="sidebar-nav">
