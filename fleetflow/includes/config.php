@@ -42,5 +42,10 @@ function requireRole($roles) {
     }
 }
 
-define('BASE_URL', '/fleetflow/');
-?>
+$script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
+if (strpos($script, '/pages/') !== false) {
+    $base = substr($script, 0, strpos($script, '/pages/') + 1);
+} else {
+    $base = rtrim(dirname($script), '/') . '/';
+}
+define('BASE_URL', $base);
