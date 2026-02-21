@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 requireLogin();
+requireRole(['manager', 'dispatcher', 'safety_officer', 'admin']);
 
 $msg = '';
 
@@ -35,7 +36,7 @@ include '../includes/header.php';
 ?>
 <div class="page-header">
     <div>
-        <div class="page-title"><i class="fas fa-id-card" style="color:var(--primary)"></i> Driver Profiles</div>
+        <div class="page-title"><i class="fas fa-id-card"></i> Driver Profiles</div>
         <div class="page-subtitle">HR, compliance & safety management</div>
     </div>
     <button class="btn btn-primary" onclick="openModal('addDriverModal')">

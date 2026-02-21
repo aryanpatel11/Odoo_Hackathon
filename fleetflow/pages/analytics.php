@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 requireLogin();
+requireRole(['manager', 'financial_analyst', 'admin']);
 
 // Fuel efficiency per vehicle (km/L)
 $fuel_eff = $conn->query("SELECT v.name, v.license_plate, v.odometer, v.acquisition_cost,
@@ -36,7 +37,7 @@ include '../includes/header.php';
 ?>
 <div class="page-header">
     <div>
-        <div class="page-title"><i class="fas fa-chart-bar" style="color:var(--primary)"></i> Analytics & Financial Reports</div>
+        <div class="page-title"><i class="fas fa-chart-bar"></i> Analytics & Financial Reports</div>
         <div class="page-subtitle">Data-driven fleet performance insights</div>
     </div>
     <div style="display:flex;gap:8px">
@@ -48,42 +49,42 @@ include '../includes/header.php';
 <!-- Overall KPIs -->
 <div class="kpi-grid">
     <div class="kpi-card">
-        <div class="kpi-icon green"><i class="fas fa-rupee-sign"></i></div>
+        <div class="kpi-icon" style="background:#f0fdf4; color:#16a34a;"><i class="fas fa-rupee-sign"></i></div>
         <div>
             <div class="kpi-value">₹<?= number_format($total_revenue/1000, 1) ?>K</div>
             <div class="kpi-label">Total Revenue</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon red"><i class="fas fa-gas-pump"></i></div>
+        <div class="kpi-icon" style="background:#fef2f2; color:#dc2626;"><i class="fas fa-gas-pump"></i></div>
         <div>
             <div class="kpi-value">₹<?= number_format($total_fuel/1000, 1) ?>K</div>
             <div class="kpi-label">Total Fuel Cost</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon yellow"><i class="fas fa-tools"></i></div>
+        <div class="kpi-icon" style="background:#fffbeb; color:#d97706;"><i class="fas fa-tools"></i></div>
         <div>
             <div class="kpi-value">₹<?= number_format($total_maint/1000, 1) ?>K</div>
             <div class="kpi-label">Total Maintenance</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon blue"><i class="fas fa-check-circle"></i></div>
+        <div class="kpi-icon" style="background:#eff6ff; color:#2563eb;"><i class="fas fa-check-circle"></i></div>
         <div>
             <div class="kpi-value"><?= $total_trips ?></div>
             <div class="kpi-label">Completed Trips</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon purple"><i class="fas fa-shield-alt"></i></div>
+        <div class="kpi-icon" style="background:#faf5ff; color:#9333ea;"><i class="fas fa-shield-alt"></i></div>
         <div>
             <div class="kpi-value"><?= $avg_safety ?></div>
             <div class="kpi-label">Avg Safety Score</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon cyan"><i class="fas fa-calculator"></i></div>
+        <div class="kpi-icon" style="background:#ecfeff; color:#0891b2;"><i class="fas fa-calculator"></i></div>
         <div>
             <div class="kpi-value">₹<?= number_format($total_revenue - $total_fuel - $total_maint, 0) ?></div>
             <div class="kpi-label">Net Profit</div>
@@ -101,8 +102,8 @@ include '../includes/header.php';
             <table>
                 <thead>
                     <tr>
-                        <th>Vehicle</th><th>Trips</th><th>Odometer</th>
-                        <th>Fuel Used (L)</th><th>Fuel Efficiency</th>
+                        <th>Vehicle</th><th>Acq. Cost</th><th>Trips</th><th>Odometer</th>
+                        <th>Fuel Used (L)</th><th>Fuel Eff.</th><th>Cost/km</th>
                         <th>Revenue</th><th>Op. Cost</th><th>ROI</th>
                     </tr>
                 </thead>
@@ -110,6 +111,7 @@ include '../includes/header.php';
                 <?php $fuel_eff->data_seek(0); while ($r = $fuel_eff->fetch_assoc()):
                     $eff = $r['total_liters'] > 0 ? round($r['odometer'] / $r['total_liters'], 2) : 0;
                     $op_cost = $r['total_fuel_cost'] + $r['maint_cost'];
+                    $cpk = $r['odometer'] > 0 ? round($op_cost / $r['odometer'], 2) : 0;
                     $roi = $r['acquisition_cost'] > 0 
                         ? round((($r['total_revenue'] - $op_cost) / $r['acquisition_cost']) * 100, 2)
                         : 0;
@@ -120,16 +122,12 @@ include '../includes/header.php';
                         <div style="font-weight:600"><?= htmlspecialchars($r['name']) ?></div>
                         <div style="font-size:11px;color:var(--text-muted)"><?= $r['license_plate'] ?></div>
                     </td>
+                    <td>₹<?= number_format($r['acquisition_cost'], 2) ?></td>
                     <td><?= $r['trips_done'] ?></td>
                     <td><?= number_format($r['odometer']) ?> km</td>
                     <td><?= number_format($r['total_liters'], 1) ?> L</td>
-                    <td>
-                        <?php if ($eff > 0): ?>
-                            <span style="font-weight:600"><?= $eff ?> km/L</span>
-                        <?php else: ?>
-                            <span style="color:var(--text-muted)">—</span>
-                        <?php endif; ?>
-                    </td>
+                    <td><?= $eff > 0 ? "<span style='font-weight:600'>{$eff} km/L</span>" : "<span style='color:var(--text-muted)'>—</span>" ?></td>
+                    <td><?= $cpk > 0 ? "₹{$cpk}" : "<span style='color:var(--text-muted)'>—</span>" ?></td>
                     <td>₹<?= number_format($r['total_revenue'], 2) ?></td>
                     <td>₹<?= number_format($op_cost, 2) ?></td>
                     <td style="font-weight:700;color:<?= $roi_color ?>"><?= $roi ?>%</td>
@@ -190,14 +188,18 @@ include '../includes/header.php';
 <!-- ROI Formula Card -->
 <div class="card" style="margin-top:20px">
     <div class="card-title" style="margin-bottom:12px"><i class="fas fa-info-circle"></i> Calculation Methodology</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;font-size:13px;color:var(--text-muted)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:13px;color:var(--text-muted)">
         <div>
             <div style="color:#60a5fa;font-weight:600;margin-bottom:4px">Fuel Efficiency</div>
             Total Odometer ÷ Total Liters Consumed = <strong style="color:#fff">km/L</strong>
         </div>
         <div>
+            <div style="color:#60a5fa;font-weight:600;margin-bottom:4px">Cost-per-km</div>
+            Total Op. Cost ÷ Total Odometer = <strong style="color:#fff">₹/km</strong>
+        </div>
+        <div>
             <div style="color:#60a5fa;font-weight:600;margin-bottom:4px">Vehicle ROI</div>
-            (Revenue − (Maintenance + Fuel)) ÷ Acquisition Cost × 100 = <strong style="color:#fff">ROI %</strong>
+            (Revenue − Op. Cost) ÷ Acquisition Cost × 100 = <strong style="color:#fff">ROI %</strong>
         </div>
         <div>
             <div style="color:#60a5fa;font-weight:600;margin-bottom:4px">Total Operational Cost</div>

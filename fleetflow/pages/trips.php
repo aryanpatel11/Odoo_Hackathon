@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 requireLogin();
+requireRole(['manager', 'dispatcher', 'admin']);
 
 $msg = '';
 
@@ -12,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $did = intval($_POST['driver_id']);
         $cargo = floatval($_POST['cargo_weight']);
 
-        $v = $conn->query("SELECT max_capacity FROM vehicles WHERE id=$vid")->fetch_assoc();
-        $d = $conn->query("SELECT license_expiry FROM drivers WHERE id=$did")->fetch_assoc();
+        $v = $conn->query("SELECT type, max_capacity FROM vehicles WHERE id=$vid")->fetch_assoc();
+        $d = $conn->query("SELECT license_category, license_expiry FROM drivers WHERE id=$did")->fetch_assoc();
 
         if (!$v || !$d) {
             $msg = ['danger', 'Invalid vehicle or driver selection.'];
@@ -21,6 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg = ['danger', "Cargo weight ({$cargo}kg) exceeds vehicle max capacity ({$v['max_capacity']}kg). Trip blocked by system!"];
         } elseif ($d['license_expiry'] < date('Y-m-d')) {
             $msg = ['danger', 'Driver license is expired. Cannot assign trip. Please update driver records.'];
+        } elseif ($d['license_category'] !== 'All' && $v['type'] !== $d['license_category']) {
+            $msg = ['danger', "Compliance Error: Driver license category ({$d['license_category']}) does not permit driving a {$v['type']}. Trip blocked."];
         } else {
             $origin = trim($_POST['origin']);
             $dest = trim($_POST['destination']);
@@ -93,7 +96,7 @@ include '../includes/header.php';
 ?>
 <div class="page-header">
     <div>
-        <div class="page-title"><i class="fas fa-route" style="color:var(--primary)"></i> Trip Dispatcher</div>
+        <div class="page-title"><i class="fas fa-route"></i> Trip Dispatcher</div>
         <div class="page-subtitle">Create and manage delivery trips</div>
     </div>
     <button class="btn btn-primary" onclick="openModal('addTripModal')">

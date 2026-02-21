@@ -2,11 +2,28 @@
 require_once '../includes/config.php';
 requireLogin();
 
+// Filter criteria
+$where_v = "WHERE 1=1";
+$where_t = "WHERE 1=1";
+
+if (!empty($_GET['type'])) {
+    $type = $conn->real_escape_string($_GET['type']);
+    $where_v .= " AND type='$type'";
+}
+if (!empty($_GET['status'])) {
+    $status = $conn->real_escape_string($_GET['status']);
+    $where_v .= " AND status='$status'";
+}
+if (!empty($_GET['region'])) {
+    $region = $conn->real_escape_string($_GET['region']);
+    $where_v .= " AND region LIKE '%$region%'";
+}
+
 // KPI queries
-$active = $conn->query("SELECT COUNT(*) as c FROM vehicles WHERE status='On Trip'")->fetch_assoc()['c'];
-$inshop = $conn->query("SELECT COUNT(*) as c FROM vehicles WHERE status='In Shop'")->fetch_assoc()['c'];
-$total_v = $conn->query("SELECT COUNT(*) as c FROM vehicles WHERE status!='Retired'")->fetch_assoc()['c'];
-$assigned = $conn->query("SELECT COUNT(*) as c FROM vehicles WHERE status IN ('On Trip')")->fetch_assoc()['c'];
+$active = $conn->query("SELECT COUNT(*) as c FROM vehicles $where_v AND status='On Trip'")->fetch_assoc()['c'];
+$inshop = $conn->query("SELECT COUNT(*) as c FROM vehicles $where_v AND status='In Shop'")->fetch_assoc()['c'];
+$total_v = $conn->query("SELECT COUNT(*) as c FROM vehicles $where_v AND status!='Retired'")->fetch_assoc()['c'];
+$assigned = $conn->query("SELECT COUNT(*) as c FROM vehicles $where_v AND status IN ('On Trip')")->fetch_assoc()['c'];
 $utilization = $total_v > 0 ? round(($assigned / $total_v) * 100) : 0;
 $pending_cargo = $conn->query("SELECT COUNT(*) as c FROM trips WHERE status IN ('Draft','Dispatched')")->fetch_assoc()['c'];
 $total_drivers = $conn->query("SELECT COUNT(*) as c FROM drivers")->fetch_assoc()['c'];
@@ -19,8 +36,8 @@ $recent_trips = $conn->query("SELECT t.*, v.name as vehicle_name, d.name as driv
     JOIN drivers d ON t.driver_id = d.id 
     ORDER BY t.created_at DESC LIMIT 5");
 
-// Vehicle status breakdown
-$v_status = $conn->query("SELECT status, COUNT(*) as c FROM vehicles WHERE status!='Retired' GROUP BY status");
+// Vehicle status breakdown (Filtered)
+$v_status = $conn->query("SELECT status, COUNT(*) as c FROM vehicles $where_v AND status!='Retired' GROUP BY status");
 $status_data = [];
 while ($r = $v_status->fetch_assoc()) $status_data[$r['status']] = $r['c'];
 
@@ -31,6 +48,27 @@ include '../includes/header.php';
         <div class="page-title"><i class="fas fa-tachometer-alt" style="color:var(--primary)"></i> Command Center</div>
         <div class="page-subtitle">Real-time fleet overview — <?= date('l, d M Y') ?></div>
     </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar" style="margin-bottom: 20px;">
+    <form method="GET" style="display:flex;gap:10px;flex-wrap:wrap;width:100%">
+        <input type="text" name="region" placeholder="🔍 Filter by region..." value="<?= htmlspecialchars($_GET['region'] ?? '') ?>">
+        <select name="type">
+            <option value="">All Vehicle Types</option>
+            <option value="Truck" <?= ($_GET['type']??'')==='Truck'?'selected':'' ?>>Truck</option>
+            <option value="Van" <?= ($_GET['type']??'')==='Van'?'selected':'' ?>>Van</option>
+            <option value="Bike" <?= ($_GET['type']??'')==='Bike'?'selected':'' ?>>Bike</option>
+        </select>
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="Available" <?= ($_GET['status']??'')==='Available'?'selected':'' ?>>Available</option>
+            <option value="On Trip" <?= ($_GET['status']??'')==='On Trip'?'selected':'' ?>>On Trip</option>
+            <option value="In Shop" <?= ($_GET['status']??'')==='In Shop'?'selected':'' ?>>In Shop</option>
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+        <a href="dashboard.php" class="btn btn-outline btn-sm">Clear</a>
+    </form>
 </div>
 
 <!-- KPIs -->
@@ -88,7 +126,7 @@ include '../includes/header.php';
 </div>
 <?php endif; ?>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(400px, 1fr));gap:24px;">
     <!-- Recent Trips -->
     <div class="card">
         <div class="card-header">
@@ -123,23 +161,25 @@ include '../includes/header.php';
             <div class="card-title"><i class="fas fa-chart-donut"></i> Fleet Status</div>
             <a href="vehicles.php" class="btn btn-outline btn-sm">Manage</a>
         </div>
-        <?php
-        $statuses = ['Available' => ['green','fa-check-circle'], 'On Trip' => ['blue','fa-road'], 'In Shop' => ['red','fa-wrench']];
-        foreach ($statuses as $st => $info): 
-            $count = $status_data[$st] ?? 0;
-            $pct = $total_v > 0 ? round(($count/$total_v)*100) : 0;
-        ?>
-        <div style="margin-bottom:16px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-size:13px;"><i class="fas <?= $info[1] ?>" style="color:var(--<?= $info[0]==='green'?'success':($info[0]==='blue'?'primary':'danger') ?>);margin-right:6px;"></i><?= $st ?></span>
-                <span style="font-size:13px;font-weight:600;"><?= $count ?> (<?= $pct ?>%)</span>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            <?php
+            $statuses = ['Available' => ['green','fa-check-circle'], 'On Trip' => ['blue','fa-road'], 'In Shop' => ['red','fa-wrench']];
+            foreach ($statuses as $st => $info): 
+                $count = $status_data[$st] ?? 0;
+                $pct = $total_v > 0 ? round(($count/$total_v)*100) : 0;
+            ?>
+            <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-size:14px; color:var(--text); font-weight:500;"><i class="fas <?= $info[1] ?>" style="color:var(--<?= $info[0]==='green'?'success':($info[0]==='blue'?'info':'danger') ?>);margin-right:8px; width: 16px; text-align:center;"></i><?= $st ?></span>
+                    <span style="font-size:14px;font-weight:600; color:var(--text);"><?= $count ?> <span style="font-weight:400; color:var(--text-muted); font-size:13px;">(<?= $pct ?>%)</span></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:<?= $pct ?>%;background:var(--<?= $info[0]==='green'?'success':($info[0]==='blue'?'info':'danger') ?>)"></div>
+                </div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width:<?= $pct ?>%;background:var(--<?= $info[0]==='green'?'success':($info[0]==='blue'?'primary':'danger') ?>)"></div>
-            </div>
+            <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:12px;">
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:13px; font-weight:500;">
             Total Active Fleet: <?= $total_v ?> vehicles
         </div>
     </div>

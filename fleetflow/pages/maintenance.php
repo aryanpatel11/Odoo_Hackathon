@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 requireLogin();
+requireRole(['manager', 'safety_officer', 'financial_analyst', 'admin']);
 
 $msg = '';
 
@@ -45,7 +46,7 @@ include '../includes/header.php';
 ?>
 <div class="page-header">
     <div>
-        <div class="page-title"><i class="fas fa-wrench" style="color:var(--primary)"></i> Maintenance & Service Logs</div>
+        <div class="page-title"><i class="fas fa-wrench"></i> Maintenance & Service Logs</div>
         <div class="page-subtitle">Preventative and reactive fleet health tracking</div>
     </div>
     <button class="btn btn-primary" onclick="openModal('addMaintModal')">

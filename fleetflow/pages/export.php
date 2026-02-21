@@ -21,6 +21,34 @@ if ($type === 'csv') {
     }
     
     fputcsv($out, []);
+    fputcsv($out, ['--- VEHICLE ROI ---']);
+    fputcsv($out, ['Vehicle', 'License Plate', 'Acq. Cost', 'Trips', 'Odometer', 'Fuel Used (L)', 'Fuel Eff.', 'Cost/km', 'Revenue', 'Op. Cost', 'ROI %']);
+    
+    $vehicles = $conn->query("SELECT v.name, v.license_plate, v.odometer, v.acquisition_cost,
+        COALESCE(SUM(fl.liters),0) as total_liters,
+        COALESCE(SUM(fl.total_cost),0) as total_fuel_cost,
+        COALESCE((SELECT SUM(ml.cost) FROM maintenance_logs ml WHERE ml.vehicle_id=v.id AND ml.status='Completed'),0) as maint_cost,
+        COALESCE((SELECT SUM(t.revenue) FROM trips t WHERE t.vehicle_id=v.id AND t.status='Completed'),0) as total_revenue,
+        COALESCE((SELECT COUNT(*) FROM trips t WHERE t.vehicle_id=v.id AND t.status='Completed'),0) as trips_done
+        FROM vehicles v
+        LEFT JOIN fuel_logs fl ON fl.vehicle_id=v.id
+        GROUP BY v.id ORDER BY total_fuel_cost DESC");
+        
+    while ($r = $vehicles->fetch_assoc()) {
+        $eff = $r['total_liters'] > 0 ? round($r['odometer'] / $r['total_liters'], 2) : 0;
+        $op_cost = $r['total_fuel_cost'] + $r['maint_cost'];
+        $cpk = $r['odometer'] > 0 ? round($op_cost / $r['odometer'], 2) : 0;
+        $roi = $r['acquisition_cost'] > 0 
+            ? round((($r['total_revenue'] - $op_cost) / $r['acquisition_cost']) * 100, 2)
+            : 0;
+            
+        fputcsv($out, [
+            $r['name'], $r['license_plate'], $r['acquisition_cost'], $r['trips_done'], $r['odometer'], 
+            $r['total_liters'], $eff, $cpk, $r['total_revenue'], $op_cost, $roi
+        ]);
+    }
+
+    fputcsv($out, []);
     fputcsv($out, ['--- FUEL LOGS ---']);
     fputcsv($out, ['ID', 'Vehicle', 'Date', 'Liters', 'Cost/L', 'Total Cost', 'Odometer', 'Station']);
     $fuels = $conn->query("SELECT fl.*, v.name as vname FROM fuel_logs fl JOIN vehicles v ON fl.vehicle_id=v.id ORDER BY fl.id DESC");
@@ -97,6 +125,44 @@ tr:nth-child(even) td { background:#f8fafc; }
         <td>₹<?= number_format($t['revenue']) ?></td>
         <td><?= $t['status'] ?></td>
         <td><?= $t['start_date'] ? date('d M Y', strtotime($t['start_date'])) : '—' ?></td>
+    </tr>
+    <?php endwhile; ?>
+</table>
+
+<h2>Vehicle ROI & Financials</h2>
+<table>
+    <tr><th>Vehicle</th><th>License Plate</th><th>Acq. Cost</th><th>Trips</th><th>Odometer</th><th>Fuel (L)</th><th>Fuel Eff.</th><th>Cost/km</th><th>Revenue</th><th>Op. Cost</th><th>ROI %</th></tr>
+    <?php
+    $vehicles = $conn->query("SELECT v.name, v.license_plate, v.odometer, v.acquisition_cost,
+        COALESCE(SUM(fl.liters),0) as total_liters,
+        COALESCE(SUM(fl.total_cost),0) as total_fuel_cost,
+        COALESCE((SELECT SUM(ml.cost) FROM maintenance_logs ml WHERE ml.vehicle_id=v.id AND ml.status='Completed'),0) as maint_cost,
+        COALESCE((SELECT SUM(t.revenue) FROM trips t WHERE t.vehicle_id=v.id AND t.status='Completed'),0) as total_revenue,
+        COALESCE((SELECT COUNT(*) FROM trips t WHERE t.vehicle_id=v.id AND t.status='Completed'),0) as trips_done
+        FROM vehicles v
+        LEFT JOIN fuel_logs fl ON fl.vehicle_id=v.id
+        GROUP BY v.id ORDER BY total_fuel_cost DESC");
+        
+    while ($r = $vehicles->fetch_assoc()):
+        $eff = $r['total_liters'] > 0 ? round($r['odometer'] / $r['total_liters'], 2) : 0;
+        $op_cost = $r['total_fuel_cost'] + $r['maint_cost'];
+        $cpk = $r['odometer'] > 0 ? round($op_cost / $r['odometer'], 2) : 0;
+        $roi = $r['acquisition_cost'] > 0 
+            ? round((($r['total_revenue'] - $op_cost) / $r['acquisition_cost']) * 100, 2)
+            : 0;
+    ?>
+    <tr>
+        <td><?= htmlspecialchars($r['name']) ?></td>
+        <td><?= htmlspecialchars($r['license_plate']) ?></td>
+        <td>₹<?= number_format($r['acquisition_cost'], 2) ?></td>
+        <td><?= $r['trips_done'] ?></td>
+        <td><?= number_format($r['odometer']) ?> km</td>
+        <td><?= number_format($r['total_liters'], 1) ?> L</td>
+        <td><?= $eff > 0 ? "{$eff} km/L" : '—' ?></td>
+        <td><?= $cpk > 0 ? "₹{$cpk}" : '—' ?></td>
+        <td>₹<?= number_format($r['total_revenue'], 2) ?></td>
+        <td>₹<?= number_format($op_cost, 2) ?></td>
+        <td style="font-weight:bold;color:<?= $roi > 0 ? '#16a34a' : '#dc2626' ?>"><?= $roi ?>%</td>
     </tr>
     <?php endwhile; ?>
 </table>

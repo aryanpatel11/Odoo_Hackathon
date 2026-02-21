@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 requireLogin();
+requireRole(['manager', 'dispatcher', 'safety_officer', 'admin']);
 
 $msg = '';
 
@@ -50,7 +51,7 @@ include '../includes/header.php';
 ?>
 <div class="page-header">
     <div>
-        <div class="page-title"><i class="fas fa-truck" style="color:var(--primary)"></i> Vehicle Registry</div>
+        <div class="page-title"><i class="fas fa-truck"></i> Vehicle Registry</div>
         <div class="page-subtitle">Manage your fleet assets</div>
     </div>
     <button class="btn btn-primary" onclick="openModal('addModal')">

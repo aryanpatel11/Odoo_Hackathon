@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/config.php';
 requireLogin();
+requireRole(['manager', 'financial_analyst', 'admin']);
 
 $msg = '';
 
@@ -41,7 +42,7 @@ include '../includes/header.php';
 ?>
 <div class="page-header">
     <div>
-        <div class="page-title"><i class="fas fa-gas-pump" style="color:var(--primary)"></i> Fuel &amp; Expense Logs</div>
+        <div class="page-title"><i class="fas fa-gas-pump"></i> Fuel &amp; Expense Logs</div>
         <div class="page-subtitle">Track operational costs per vehicle</div>
     </div>
     <button class="btn btn-primary" onclick="openModal('addFuelModal')">

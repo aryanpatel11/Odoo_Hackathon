@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FleetFlow - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -64,16 +67,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST">
             <div class="form-group">
                 <label><i class="fas fa-envelope"></i> Email Address</label>
-                <input type="email" name="email" placeholder="Enter your email" required value="manager@fleetflow.com">
+                <input type="email" name="email" placeholder="Enter your email" required autofocus>
             </div>
             <div class="form-group">
                 <label><i class="fas fa-lock"></i> Password</label>
-                <input type="password" name="password" placeholder="Enter your password" required value="password">
+                <input type="password" name="password" placeholder="Enter your password" required>
             </div>
             <button type="submit" class="btn btn-primary login-btn">
                 <i class="fas fa-sign-in-alt"></i> Sign In
             </button>
-            <div style="text-align:right;margin-top:10px;">
+            <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px;">
+                <a href="register.php" style="color:var(--primary);text-decoration:none;">Create an Account</a>
                 <button type="submit" name="forgot" value="1" style="background:none;border:none;color:var(--primary);font-size:13px;cursor:pointer;">
                     Forgot Password?
                 </button>
